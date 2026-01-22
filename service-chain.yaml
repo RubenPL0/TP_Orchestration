@@ -1,0 +1,61 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+description: >
+  Chaîne de services réseau : Firewall -> Load Balancer -> Web Server
+  orchestrée avec xOpera.
+
+node_types:
+  raul.nodes.DockerContainer:
+    derived_from: tosca.nodes.Root
+    properties:
+      image:
+        type: string
+        required: true
+      container_name:
+        type: string
+        required: true
+      ports:
+        type: string
+        required: false
+
+topology_template:
+  node_templates:
+    WebServer:
+      type: raul.nodes.DockerContainer
+      properties:
+        image: "nginx"
+        container_name: "vnf-web"
+        ports: "8081:80"
+      interfaces:
+        Standard:
+          operations:
+            create:
+              implementation: playbooks/deploy_webserver.yaml
+
+    LoadBalancer:
+      type: raul.nodes.DockerContainer
+      properties:
+        image: "haproxytech/haproxy-alpine"
+        container_name: "vnf-lb"
+        ports: "9090:80"
+      requirements:
+        - dependency: WebServer
+      interfaces:
+        Standard:
+          operations:
+            create:
+              implementation: playbooks/deploy_loadbalancer.yaml
+
+    Firewall:
+      type: raul.nodes.DockerContainer
+      properties:
+        image: "wallarm/api-firewall"
+        container_name: "vnf-firewall"
+        ports: "8080:8080"
+      requirements:
+        - dependency: LoadBalancer
+      interfaces:
+        Standard:
+          operations:
+            create:
+              implementation: playbooks/deploy_firewall.yaml

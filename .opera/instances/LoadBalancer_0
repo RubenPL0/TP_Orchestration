@@ -1,0 +1,26 @@
+{
+  "tosca_name": {
+    "is_set": true,
+    "data": "LoadBalancer"
+  },
+  "tosca_id": {
+    "is_set": true,
+    "data": "LoadBalancer_0"
+  },
+  "state": {
+    "is_set": true,
+    "data": "started"
+  },
+  "image": {
+    "is_set": true,
+    "data": "haproxytech/haproxy-alpine"
+  },
+  "container_name": {
+    "is_set": true,
+    "data": "vnf-lb"
+  },
+  "ports": {
+    "is_set": true,
+    "data": "9090:80"
+  }
+}

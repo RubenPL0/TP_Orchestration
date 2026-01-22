@@ -1,0 +1,49 @@
+services:
+  # VNF 1 : Firewall
+  firewall:
+    image: wallarm/api-firewall
+    container_name: vnf-firewall
+    ports:
+      - "8080:8080"
+    environment:
+      - APIFW_URL=http://0.0.0.0:8080
+      - APIFW_SERVER_URL=http://vnf-lb:80
+      - APIFW_API_SPECS=/api-specs/openapi.yaml
+      - APIFW_REQUEST_VALIDATION=LOG_ONLY
+      - APIFW_RESPONSE_VALIDATION=DISABLE
+    volumes:
+      - ./openapi.yaml:/api-specs/openapi.yaml
+    depends_on:
+      - loadbalancer
+    networks:
+      - net-chain
+    restart: unless-stopped
+
+  # VNF 2 : Load Balancer
+  loadbalancer:
+    image: haproxytech/haproxy-alpine
+    container_name: vnf-lb
+    ports:
+      - "9090:80"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - webserver
+    networks:
+      - net-chain
+    restart: unless-stopped
+
+  # VNF 3 : Web Server
+  webserver:
+    image: nginx
+    container_name: vnf-web
+    ports:
+      - "8081:80"
+    networks:
+      - net-chain
+    restart: unless-stopped
+
+# Réseau partagé entre les VNFs
+networks:
+  net-chain:
+    driver: bridge

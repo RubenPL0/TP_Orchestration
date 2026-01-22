@@ -1,0 +1,26 @@
+{
+  "tosca_name": {
+    "is_set": true,
+    "data": "Firewall"
+  },
+  "tosca_id": {
+    "is_set": true,
+    "data": "Firewall_0"
+  },
+  "state": {
+    "is_set": true,
+    "data": "started"
+  },
+  "image": {
+    "is_set": true,
+    "data": "wallarm/api-firewall"
+  },
+  "container_name": {
+    "is_set": true,
+    "data": "vnf-firewall"
+  },
+  "ports": {
+    "is_set": true,
+    "data": "8080:8080"
+  }
+}
