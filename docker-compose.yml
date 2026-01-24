@@ -1,5 +1,4 @@
 services:
-  # VNF 1 : Firewall
   firewall:
     image: wallarm/api-firewall
     container_name: vnf-firewall
@@ -13,13 +12,9 @@ services:
       - APIFW_RESPONSE_VALIDATION=DISABLE
     volumes:
       - ./openapi.yaml:/api-specs/openapi.yaml
-    depends_on:
-      - loadbalancer
     networks:
       - net-chain
-    restart: unless-stopped
 
-  # VNF 2 : Load Balancer
   loadbalancer:
     image: haproxytech/haproxy-alpine
     container_name: vnf-lb
@@ -28,22 +23,20 @@ services:
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     depends_on:
-      - webserver
+      - firewall
     networks:
       - net-chain
-    restart: unless-stopped
 
-  # VNF 3 : Web Server
   webserver:
     image: nginx
     container_name: vnf-web
     ports:
       - "8081:80"
+    depends_on:
+      - loadbalancer
     networks:
       - net-chain
-    restart: unless-stopped
 
-# Réseau partagé entre les VNFs
 networks:
   net-chain:
     driver: bridge

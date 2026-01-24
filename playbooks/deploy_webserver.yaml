@@ -2,7 +2,7 @@
 - name: Déploiement du VNF Web Server
   hosts: localhost
   tasks:
-    - name: Supprimer le conteneur existant (si présent)
+    - name: Supprimer le conteneur existant 
       command: docker rm -f vnf-web
       ignore_errors: yes
     - name: Lancer le conteneur Web Server

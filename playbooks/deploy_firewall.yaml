@@ -4,12 +4,16 @@
   vars:
     project_dir: /home/ruben/Orchestration/network-orchestration
   tasks:
-    - name: Supprimer le conteneur existant (si présent)
+    - name: Créer le réseau Docker 
+      command: docker network create net-chain
+      ignore_errors: yes
+    - name: Supprimer le conteneur existant 
       command: docker rm -f vnf-firewall
       ignore_errors: yes
     - name: Lancer le conteneur Firewall
       shell: |
         docker run -d --name vnf-firewall --network net-chain -p 8080:8080 \
+        --restart on-failure \
         -v {{ project_dir }}/openapi.yaml:/api.yaml \
         -e APIFW_URL=http://0.0.0.0:8080 \
         -e APIFW_API_SPECS=/api.yaml \

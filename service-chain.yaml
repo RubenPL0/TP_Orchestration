@@ -20,17 +20,17 @@ node_types:
 
 topology_template:
   node_templates:
-    WebServer:
+    Firewall:
       type: raul.nodes.DockerContainer
       properties:
-        image: "nginx"
-        container_name: "vnf-web"
-        ports: "8081:80"
+        image: "wallarm/api-firewall"
+        container_name: "vnf-firewall"
+        ports: "8080:8080"
       interfaces:
         Standard:
           operations:
             create:
-              implementation: playbooks/deploy_webserver.yaml
+              implementation: playbooks/deploy_firewall.yaml
 
     LoadBalancer:
       type: raul.nodes.DockerContainer
@@ -39,23 +39,23 @@ topology_template:
         container_name: "vnf-lb"
         ports: "9090:80"
       requirements:
-        - dependency: WebServer
+        - dependency: Firewall
       interfaces:
         Standard:
           operations:
             create:
               implementation: playbooks/deploy_loadbalancer.yaml
 
-    Firewall:
+    WebServer:
       type: raul.nodes.DockerContainer
       properties:
-        image: "wallarm/api-firewall"
-        container_name: "vnf-firewall"
-        ports: "8080:8080"
+        image: "nginx"
+        container_name: "vnf-web"
+        ports: "8081:80"
       requirements:
         - dependency: LoadBalancer
       interfaces:
         Standard:
           operations:
             create:
-              implementation: playbooks/deploy_firewall.yaml
+              implementation: playbooks/deploy_webserver.yaml
